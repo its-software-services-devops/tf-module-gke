@@ -47,6 +47,17 @@ resource "google_container_cluster" "gke_cluster" {
     }
   }
 
+  private_cluster_config {
+    enable_private_nodes  = true
+    enable_private_endpoint = false
+    master_ipv4_cidr_block = "192.168.0.0/28"
+  }
+
+  ip_allocation_policy {
+    cluster_secondary_range_name  = ""
+    services_secondary_range_name = ""
+  }
+
   timeouts {
     create = "30m"
     update = "40m"

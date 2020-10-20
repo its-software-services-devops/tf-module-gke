@@ -21,7 +21,7 @@ module "gke-cluster-00" {
   source             = "../modules"
   cluster_name       = "terraform-gke-module-test"
   node_pools         = [
-        {pool_name="db",  pool_size=2, machine_type="e2-medium", tags=["database"], label={"role"="database"}},
+        {pool_name="db",  pool_size=1, machine_type="e2-medium", tags=["database"], label={"role"="database"}},
         {pool_name="ing", pool_size=1, machine_type="e2-medium", tags=["ingress"], label={"role"="ingress"}}
       ]
 }
