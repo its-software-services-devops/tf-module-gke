@@ -5,26 +5,27 @@ terraform {
 }
 
 resource "google_container_node_pool" "gke_pool" {
-  name       = var.pool_name
+  count      = length(var.node_pools)
+
+  name       = var.node_pools[count.index].pool_name
+  node_count = var.node_pools[count.index].pool_size
+
   location   = var.cluster_location
   cluster    = google_container_cluster.gke_cluster.name
-  node_count = var.pool_node_count
+  
 
   node_config {
     preemptible  = var.cluster_preemptible
-    machine_type = var.cluster_machine_type
+    machine_type = var.node_pools[count.index].machine_type
 
     metadata = {
       disable-legacy-endpoints = true
     }
 
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring",
-    ]
+    oauth_scopes = var.cluster_oauth_scopes
 
-    labels = {}
-    tags = var.cluster_node_tags    
+    labels = var.node_pools[count.index].label
+    tags = var.node_pools[count.index].tags
   }
 }
 

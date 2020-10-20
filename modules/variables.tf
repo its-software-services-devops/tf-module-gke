@@ -10,21 +10,10 @@ variable "cluster_location" {
   default     = "asia-southeast1-a"
 }
 
-variable "cluster_node_tags" {
-  type    = list(string)
-  default = []
-}
-
 variable "cluster_network" {
   description = "Network"
   type        = string
   default     = "default"
-}
-
-variable "cluster_machine_type" {
-  description = "Machine type"
-  type        = string
-  default     = "n1-standard-1"
 }
 
 variable "cluster_subnet" {
@@ -39,14 +28,22 @@ variable "cluster_preemptible" {
   default     = false
 }
 
-variable "pool_name" {
-  description = "Pool name"
-  type        = string
-  default     = ""
+variable "cluster_oauth_scopes" {
+    type       = list(string)
+    default    = [
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+    ]
 }
 
-variable "pool_node_count" {
-  description = "Pool node count"
-  type        = number
-  default     = 3
+variable "node_pools" {
+  type = list(object({
+    pool_name    = string
+    pool_size    = number
+    machine_type = string
+    tags         = list(string)
+    label        = map(string)
+  }))
+
+  default = []
 }
