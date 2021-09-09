@@ -1,27 +1,41 @@
-# Run this at the beginning : export GOOGLE_CREDENTIALS="D:/dev/keys/its-artifact-commons-6eb8e8c315b3.json"
+#### NOT YET TEST !!!! ####
+locals {
+  project = "its-artifact-commons"
+  region = "us-west1"
 
-terraform {
-  required_providers {
-    google = "~> 3.4.0"
-  }
-
-  backend "gcs" {
-    bucket  = "its-terraform-states"
-    prefix  = "tf-module-gke"
-  } 
+  cluster_name = "yru-openedx-prod-1"
+  network_name = "team-a-vpc-network"
+  kubernetes_version = "1.20.9-gke.700"
+  nodes_subnetwork_name = "team-a-vpc-network"
+  pods_secondary_ip_range_name = ""
+  services_secondary_ip_range_name = ""
+  master_ipv4_cidr_block = "10.128.254.0/28"
 }
 
-provider "google" {
-  project     = "its-artifact-commons"
-  region      = "asia-southeast1"
-  credentials = file("D:/dev/keys/its-artifact-commons-6eb8e8c315b3.json")
-}
+#### Cluster ####
+module "yru-openedx-prod-cluster" {
+  source = "./modules"
 
-module "gke-cluster-00" {
-  source             = "../modules"
-  cluster_name       = "terraform-gke-module-test"
-  node_pools         = [
-        {pool_name="db",  pool_size=1, machine_type="e2-medium", tags=["database"], label={"role"="database"}},
-        {pool_name="ing", pool_size=1, machine_type="e2-medium", tags=["ingress"], label={"role"="ingress"}}
-      ]
+  name                             = local.cluster_name
+  region                           = local.region
+  #project                          = local.project
+  kubernetes_version               = local.kubernetes_version
+  network_name                     = local.network_name
+  nodes_subnetwork_name            = local.nodes_subnetwork_name
+  pods_secondary_ip_range_name     = local.pods_secondary_ip_range_name
+  services_secondary_ip_range_name = local.services_secondary_ip_range_name
+  enable_shielded_nodes            = true
+
+  # private cluster options
+  enable_private_endpoint = false
+  enable_private_nodes    = true
+  master_ipv4_cidr_block  = local.master_ipv4_cidr_block
+
+  master_authorized_network_cidrs = [
+    {
+      # This is the module default, but demonstrates specifying this input.
+      cidr_block   = "0.0.0.0/0"
+      display_name = "from the Internet"
+    },
+  ]
 }
