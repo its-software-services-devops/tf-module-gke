@@ -13,7 +13,6 @@ resource "google_container_cluster" "cluster" {
   logging_service       = var.logging_service
   enable_shielded_nodes = var.enable_shielded_nodes
 
-
   vertical_pod_autoscaling {
     enabled = var.vpa_enabled
   }
@@ -29,9 +28,6 @@ resource "google_container_cluster" "cluster" {
 
   # The absence of a user and password here disables basic auth
   master_auth {
-    username = ""
-    password = ""
-
     client_certificate_config {
       issue_client_certificate = false
     }
@@ -47,12 +43,17 @@ resource "google_container_cluster" "cluster" {
     network_policy_config {
       disabled = false
     }
+
+    # Beta - Need to wait for new version
+    #gke_backup_agent_config {
+    #  enabled = var.enable_gke_backup
+    #}
   }
 
   dynamic "workload_identity_config" {
     for_each = local.cluster_workload_identity_namespace
     content {
-      identity_namespace = local.cluster_workload_identity_namespace[0]
+      workload_pool = local.cluster_workload_identity_namespace[0]
     }
   }
 
