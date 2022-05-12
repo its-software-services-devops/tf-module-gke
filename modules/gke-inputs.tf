@@ -79,6 +79,12 @@ variable "vpa_enabled" {
   default     = false
 }
 
+variable "enable_gke_backup" {
+  type        = bool
+  description = "A boolean to enable GKE backup"
+  default     = false
+}
+
 variable "enable_workload_identity" {
   type        = bool
   description = "A boolean to enable workload identity"
